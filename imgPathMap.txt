@@ -1,0 +1,15 @@
+reroll,img/reroll
+confirm,img/confirm
+skip1,img/skip1
+skip2,img/skip2
+skip3,img/skip3
+Helena-b_rank_idol,img/Helena-b_rank_idol
+Loen-Track_and_Field_Team_Member,img/Loen-Track_and_Field_Team_Member
+Loen-Last_Hope,img/Loen-Last_Hope
+Sacred_Justia-Reclaimed_Destiny,img/Sacred_Justia-Reclaimed_Destiny
+Diana-adventurer_of_the_unknown,img/Diana-adventurer_of_the_unknown
+Teresse-Medical_Club,img/Teresse-Medical_Club
+Lathel-Homunculus,img/Lathel-Homunculus
+Yuri-Comeback_Idol,img/Yuri-Comeback_Idol
+Refithea-White_Blessing,img/Refithea-White_Blessing
+5star,img/5star

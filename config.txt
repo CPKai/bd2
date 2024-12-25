@@ -1,0 +1,4 @@
+ScreenResolutionWidth,1920
+ScreenResolutionHeight,1080
+tolerance_s,0.2
+tolerance,0.27

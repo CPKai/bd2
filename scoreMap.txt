@@ -1,0 +1,11 @@
+target_score,500
+Helena-b_rank_idol,100
+Loen-Track_and_Field_Team_Member,100
+Loen-Last_Hope,100
+Sacred_Justia-Reclaimed_Destiny,100
+Diana-adventurer_of_the_unknown,100
+Teresse-Medical_Club,100
+Lathel-Homunculus,100
+Yuri-Comeback_Idol,100
+Refithea-White_Blessing,100
+5star,100
