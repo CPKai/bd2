@@ -37,8 +37,6 @@ func main() {
 	configMap := load_map_str_float64("config.txt")
 	setScreenPhysicResolutionRatio(configMap)
 
-	activeTargetProcess("BrownDust")
-
 	if debugSwitch {
 		fmt.Printf("args[]:%v\n", os.Args)
 		fmt.Printf("configMap:%v\n", configMap)
@@ -47,6 +45,7 @@ func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "test":
+			activeTargetProcess("BrownDust")
 			fmt.Printf("運行測試\n")
 			test(configMap)
 		case "info":
@@ -60,6 +59,7 @@ func main() {
 				fmt.Printf("腳本將在%d秒後開始運行...\n", i)
 				time.Sleep(time.Duration(1000) * time.Millisecond)
 			}
+			activeTargetProcess("BrownDust")
 			// 主邏輯運行
 			start_infinite_gacha(configMap)
 		}
@@ -68,6 +68,7 @@ func main() {
 			fmt.Printf("腳本將在%d秒後開始運行...\n", i)
 			time.Sleep(time.Duration(1000) * time.Millisecond)
 		}
+		activeTargetProcess("BrownDust")
 		// 主邏輯運行
 		start_infinite_gacha(configMap)
 	}
