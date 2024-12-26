@@ -12,7 +12,7 @@ import (
 	robotgo "github.com/go-vgo/robotgo"
 	gohook "github.com/robotn/gohook"
 	bitmap "github.com/vcaesar/bitmap"
-	"github.com/vcaesar/imgo"
+	imgo "github.com/vcaesar/imgo"
 )
 
 var (
@@ -26,9 +26,12 @@ var (
 func main() {
 
 	// 啟動監聽 stopKey 的執行緒
-	fmt.Println("終止程序請按按鍵 " + stopKey)
 	go exitEvent()
 	fmt.Println("*******************************************************")
+	fmt.Println("終止程序請按按鍵 " + stopKey)
+	fmt.Println("*******************************************************")
+	fmt.Println("查看設定，請下autoBD2.exe info")
+	fmt.Printf("測試程式截圖與計分邏輯，請下autoBD2.exe test\n\n")
 
 	// 加載設定檔
 	configMap := load_map_str_float64("config.txt")
@@ -46,11 +49,25 @@ func main() {
 		case "test":
 			fmt.Printf("運行測試\n")
 			test(configMap)
+		case "info":
+			fmt.Printf("列出設定內容\n")
+			settingInfo(configMap)
+		case "debug":
+			debugSwitch = true
+			start_infinite_gacha(configMap)
 		default:
+			for i := 3; i > 0; i-- {
+				fmt.Printf("腳本將在%d秒後開始運行...\n", i)
+				time.Sleep(time.Duration(1000) * time.Millisecond)
+			}
 			// 主邏輯運行
 			start_infinite_gacha(configMap)
 		}
 	} else {
+		for i := 3; i > 0; i-- {
+			fmt.Printf("腳本將在%d秒後開始運行...\n", i)
+			time.Sleep(time.Duration(1000) * time.Millisecond)
+		}
 		// 主邏輯運行
 		start_infinite_gacha(configMap)
 	}
@@ -64,6 +81,8 @@ func exitEvent() {
 	if exitEvent {
 		// 確認退出
 		fmt.Println("\n檢測到退出指令，程序即將結束...")
+		pid := robotgo.GetPid()
+		robotgo.ActivePid(pid)
 		os.Exit(0) // 結束程式
 	}
 }
@@ -153,16 +172,16 @@ func findImage(imgPath string, scanMaxTime int, resolutionWidth int, resolutionH
 
 func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 	scoreMap := load_map_str_float64("scoreMap.txt")
-	target_score := int(scoreMap["target_score"])
+	target_score := int(scoreMap["目標分數"])
 	current_core := 0
 	bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
 
 	for character, score := range scoreMap {
-		if (character != "target_score") && (score > 0) {
+		if (character != "目標分數") && (score > 0) {
 			var tempPosArr []robotgo.Point
 
 			// 刷1次求快速
-			if character == "5star" {
+			if character == "5星角色" {
 				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["tolerance_s"])
 			} else {
 				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["tolerance"])
@@ -184,7 +203,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 		os.Exit(0)
 
 	} else if current_core >= 300 {
-		if true {
+		if debugSwitch {
 			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
 			img := robotgo.ToImage(bitmap_screen)
 			imgName := getNextImageFileName("save")
@@ -273,6 +292,33 @@ func test(configMap map[string]float64) {
 	imgo.Save("test.png", img)
 
 	robotgo.FreeBitmap(sbit)
+
+	pid := robotgo.GetPid()
+	robotgo.ActivePid(pid)
+}
+
+func settingInfo(configMap map[string]float64) {
+
+	// 加載設定檔
+	imgMap := load_map_str_str("imgPathMap.txt")
+	scoreMap := load_map_str_float64("scoreMap.txt")
+
+	fmt.Printf("螢幕解析度-寬:%d | 長:%d\n", int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
+	fmt.Println("螢幕解析度設定錯誤的話，請至「config.txt」中修正ScreenResolutionWidth(寬)與ScreenResolutionHeight(高)的值")
+
+	fmt.Printf("目標分數:%d\n", int(scoreMap["目標分數"]))
+	fmt.Printf("以下是各角色設定的分數與判斷圖片路徑\n")
+	for character, score := range scoreMap {
+		if character != "目標分數" {
+			var imgPath string
+			if imgMap[character] != "" {
+				imgPath = imgMap[character] + imgFormat
+			} else {
+				imgPath = "未找到" + character + "的圖片路徑"
+			}
+			fmt.Printf("角色：%s | 分數:%d | 判定圖片路徑:%s\n", character, int(score), imgPath)
+		}
+	}
 }
 
 // 取得 save 資料夾中下一個圖片檔名
