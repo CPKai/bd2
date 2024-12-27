@@ -3,6 +3,8 @@ confirm,img/confirm
 skip1,img/skip1
 skip2,img/skip2
 skip3,img/skip3
+skip_doombook,img/skip_doombook
+rechallenge,img/rechallenge
 海倫娜-B級偶像,img/Helena-b_rank_idol
 羅安-田徑社社員,img/Loen-Track_and_Field_Team_Member
 羅安-最後希望,img/Loen-Last_Hope

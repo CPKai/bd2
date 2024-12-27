@@ -51,6 +51,9 @@ func main() {
 		case "info":
 			fmt.Printf("列出設定內容\n")
 			settingInfo(configMap)
+		case "doombook":
+			activeTargetProcess("BrownDust")
+			startDoombook(configMap)
 		case "debug":
 			debugSwitch = true
 			start_infinite_gacha(configMap)
@@ -348,5 +351,21 @@ func setScreenPhysicResolutionRatio(configMap map[string]float64) {
 		fmt.Printf("configMap:%v\nconfigMap[\"ScreenResolutionWidth\"]:%f\n", configMap, configMap["ScreenResolutionWidth"])
 		fmt.Printf("physical width:%d | resolution width:%d | widthRatio:%f\n", pW, rW, prRatio_width)
 		fmt.Printf("physical height:%d | resolution height:%d | heightRatio:%f\n", pH, rH, prRatio_height)
+	}
+}
+
+func startDoombook(configMap map[string]float64) {
+
+	// 加載設定檔
+	imgMap := load_map_str_str("imgPathMap.txt")
+	round := 1
+
+	for {
+		fmt.Printf("\nCurrent Round: %d\n", round)
+		time.Sleep(200 * time.Millisecond)
+		findImage(imgMap["rechallenge"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["confirm"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["skip_doombook"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+		round++
 	}
 }
