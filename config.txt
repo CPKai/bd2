@@ -1,4 +1,5 @@
-ScreenResolutionWidth,1920
-ScreenResolutionHeight,1080
-tolerance_s,0.2
-tolerance,0.27
+螢幕解析度-寬,1920
+螢幕解析度-高,1080
+容忍值_小,0.2
+容忍值_角色,0.27
+睡眠參數(毫秒),100

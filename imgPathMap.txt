@@ -1,10 +1,10 @@
-reroll,img/reroll
-confirm,img/confirm
+再抽一次,img/reroll
+確認,img/confirm
 skip1,img/skip1
 skip2,img/skip2
 skip3,img/skip3
-skip_doombook,img/skip_doombook
-rechallenge,img/rechallenge
+skip4,img/skip4
+重新挑戰,img/rechallenge
 海倫娜-B級偶像,img/Helena-b_rank_idol
 羅安-田徑社社員,img/Loen-Track_and_Field_Team_Member
 羅安-最後希望,img/Loen-Last_Hope

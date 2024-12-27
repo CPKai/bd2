@@ -104,15 +104,15 @@ func start_infinite_gacha(configMap map[string]float64) {
 		fmt.Printf("\nCurrent Round: %d\n", round)
 		time.Sleep(200 * time.Millisecond)
 
-		findImage(imgMap["reroll"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
-		findImage(imgMap["confirm"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["再抽一次"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
+		findImage(imgMap["確認"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
 
 		for {
-			findImage(imgMap["skip1"]+imgFormat, 2, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
-			findImage(imgMap["skip2"]+imgFormat, 2, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
-			findImage(imgMap["skip3"]+imgFormat, 2, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+			findImage(imgMap["skip1"]+imgFormat, 2, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
+			findImage(imgMap["skip2"]+imgFormat, 2, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
+			findImage(imgMap["skip3"]+imgFormat, 2, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
 
-			tempPos = findImage(imgMap["reroll"]+imgFormat, 2, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], false, 100, prRatio_width, prRatio_height)
+			tempPos = findImage(imgMap["再抽一次"]+imgFormat, 2, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], false, int(configMap["睡眠參數(毫秒)"]), prRatio_width, prRatio_height)
 			if tempPos[0] > 0 {
 				break
 			}
@@ -135,7 +135,7 @@ func findImage(imgPath string, scanMaxTime int, resolutionWidth int, resolutionH
 		scanTime++
 
 		// 印出當前訊息
-		printStr := "step: " + imgPath + " || scanTime: " + strconv.Itoa(scanTime) + " / " + strconv.Itoa(scanMaxTime)
+		printStr := "步驟: 比對「" + imgPath + "」圖片... || scanTime: " + strconv.Itoa(scanTime) + " / " + strconv.Itoa(scanMaxTime)
 		fmt.Print(printStr)
 
 		// 取得螢幕擷圖
@@ -178,7 +178,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 	scoreMap := load_map_str_float64("scoreMap.txt")
 	target_score := int(scoreMap["目標分數"])
 	current_core := 0
-	bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
+	bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 
 	for character, score := range scoreMap {
 		if (character != "目標分數") && (score > 0) {
@@ -186,9 +186,9 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 
 			// 刷1次求快速
 			if character == "5星角色" {
-				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["tolerance_s"])
+				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["容忍值_小"])
 			} else {
-				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["tolerance"])
+				tempPosArr = bitmap.FindAll(bitmap.Open(imgMap[character]+imgFormat), bitmap_screen, configMap["容忍值_角色"])
 			}
 
 			current_core += len(tempPosArr) * int(score)
@@ -208,7 +208,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 
 	} else if current_core >= 300 {
 		if debugSwitch {
-			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
+			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 			img := robotgo.ToImage(bitmap_screen)
 			imgName := getNextImageFileName("save")
 			imgo.Save("save/"+imgName+"-"+strconv.Itoa(current_core)+".png", img)
@@ -290,7 +290,7 @@ func test(configMap map[string]float64) {
 	calculateScore(configMap, imgMap)
 
 	fmt.Println("進行螢幕截圖......")
-	sbit := robotgo.CaptureScreen(0, 0, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
+	sbit := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 	fmt.Println("進行螢幕截圖的儲存(於執行檔目錄)，檔名：test.png")
 	img := robotgo.ToImage(sbit)
 	imgo.Save("test.png", img)
@@ -307,8 +307,11 @@ func settingInfo(configMap map[string]float64) {
 	imgMap := load_map_str_str("imgPathMap.txt")
 	scoreMap := load_map_str_float64("scoreMap.txt")
 
-	fmt.Printf("螢幕解析度-寬:%d | 長:%d\n", int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]))
-	fmt.Println("螢幕解析度設定錯誤的話，請至「config.txt」中修正ScreenResolutionWidth(寬)與ScreenResolutionHeight(高)的值")
+	fmt.Println("config設定如下")
+	for k, v := range configMap {
+		fmt.Printf("%s:%f\n", k, v)
+	}
+	fmt.Printf("螢幕解析度設定錯誤的話，請至「config.txt」中修正「螢幕解析度-寬」與「螢幕解析度-高」的值\n\n")
 
 	fmt.Printf("目標分數:%d\n", int(scoreMap["目標分數"]))
 	fmt.Printf("以下是各角色設定的分數與判斷圖片路徑\n")
@@ -343,12 +346,12 @@ func getNextImageFileName(folderPath string) string {
 func setScreenPhysicResolutionRatio(configMap map[string]float64) {
 
 	pW, pH := robotgo.GetScreenSize()
-	rW, rH := int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"])
+	rW, rH := int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"])
 
 	prRatio_width = float64(pW) / float64(rW)
 	prRatio_height = float64(pH) / float64(rH)
 	if debugSwitch {
-		fmt.Printf("configMap:%v\nconfigMap[\"ScreenResolutionWidth\"]:%f\n", configMap, configMap["ScreenResolutionWidth"])
+		fmt.Printf("configMap:%v\nconfigMap[\"螢幕解析度-寬\"]:%f\n", configMap, configMap["螢幕解析度-寬"])
 		fmt.Printf("physical width:%d | resolution width:%d | widthRatio:%f\n", pW, rW, prRatio_width)
 		fmt.Printf("physical height:%d | resolution height:%d | heightRatio:%f\n", pH, rH, prRatio_height)
 	}
@@ -363,9 +366,9 @@ func startDoombook(configMap map[string]float64) {
 	for {
 		fmt.Printf("\nCurrent Round: %d\n", round)
 		time.Sleep(200 * time.Millisecond)
-		findImage(imgMap["rechallenge"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
-		findImage(imgMap["confirm"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
-		findImage(imgMap["skip_doombook"]+imgFormat, -1, int(configMap["ScreenResolutionWidth"]), int(configMap["ScreenResolutionHeight"]), configMap["tolerance_s"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["重新挑戰"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["確認"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, 100, prRatio_width, prRatio_height)
+		findImage(imgMap["skip4"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, 100, prRatio_width, prRatio_height)
 		round++
 	}
 }
