@@ -1,5 +1,11 @@
 @echo off
-setlocal
+
+:: 設置字符編碼為 UTF-8
+chcp 65001 >nul
+
+:: cd至bat檔存放的資料夾
+cd /d "%~dp0"
+
 :: 檢查是否已具有管理員權限
 net session >nul 2>&1
 if not %errorlevel%==0 (
@@ -13,7 +19,7 @@ set target_exe_name="autoBD2.ex"
 set new_exe_name="autoBD2.exe"
 
 :: 檢查目標檔案是否存在
-if exist %target_exe_name% (
+if exist %new_exe_name% (
     echo %new_exe_name% 已存在，跳過更名動作。
 ) else if exist %target_exe_name% (
     ren %target_exe_name% %new_exe_name%
@@ -28,5 +34,4 @@ set echoStr2="目錄正確後，執行命令「.\autoBD2.exe」即可運行程�
 
 :: 啟動 Windows Terminal
 start wt -p "Windows PowerShell" powershell.exe -NoExit -Command "& {cd '%~dp0'\; ls\; echo '%echoStr1%'\; echo '%echoStr2%'}"
-endlocal
 exit
