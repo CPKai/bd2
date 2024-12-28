@@ -8,9 +8,10 @@
 7. 範例影片: https://youtu.be/ebD1dYi-Jfw
 
 # 使用流程-250101後版本
-1. 下載「autoBD2.rar」壓縮包並解壓縮，取得資料夾「autoBD2」
+1. 下載「autoBD2-日期.rar」壓縮包並解壓縮，取得資料夾「autoBD2」
 2. 於autoBD2資料夾中新增文字文件，將「[runWT.bat內容連結](https://github.com/CPKai/bd2/blob/main/runWT.bat)」中，文本內容複製，並貼進文件中，然後儲存檔案
-3. 修改剛剛新增的文件名稱，取名「runWT.bat」，並確認檔案類型轉為「Windows批次檔案」，而非文字檔(.txt)
+3. 修改剛剛新增的文件名稱，取名「runWT.bat」，並確認檔案類型轉為「Windows批次檔案」，而非文字檔(.txt)  
+不知如何修改副檔名，可以Google「Win11 變更副檔名」，網上有許多相關教學
 4. 雙擊「runWT.bat」後，會以管理員權限開啟「終端機」的PowerShell
 5. 在上一步開啟的PowerShell中執行「.\autoBD2.exe」命令，會列出可運行的模式及其代碼
 6. 執行「.\autoBD2.exe 欲運行模式代碼」即可運行該模式
