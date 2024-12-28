@@ -21,6 +21,12 @@ var (
 	imgFormat      = ".png"
 	prRatio_width  float64
 	prRatio_height float64
+	modeList       = map[string]string{
+		"iGacha":   "無限抽抽樂-自動抽取",
+		"info":     "查看「無限抽抽樂-自動抽取」的評分設定",
+		"test":     "測試「autoBD2螢幕截圖」與「無樂抽抽樂-自動抽取」的評分邏輯",
+		"doombook": "未日之書-無限重複挑戰",
+	}
 )
 
 func main() {
@@ -30,8 +36,6 @@ func main() {
 	fmt.Println("*******************************************************")
 	fmt.Println("終止程序請按按鍵 " + stopKey)
 	fmt.Println("*******************************************************")
-	fmt.Println("查看設定，請下autoBD2.exe info")
-	fmt.Printf("測試程式截圖與計分邏輯，請下autoBD2.exe test\n\n")
 
 	// 加載設定檔
 	configMap := load_map_str_float64("config.txt")
@@ -42,22 +46,27 @@ func main() {
 		fmt.Printf("configMap:%v\n", configMap)
 	}
 
+	fmt.Printf("\n\n")
+
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "test":
+			fmt.Printf("運行模式：%s\n", os.Args[1])
 			activeTargetProcess("BrownDust")
-			fmt.Printf("運行測試\n")
 			test(configMap)
 		case "info":
-			fmt.Printf("列出設定內容\n")
+			fmt.Printf("運行模式：%s\n", os.Args[1])
 			settingInfo(configMap)
 		case "doombook":
+			fmt.Printf("運行模式：%s\n", os.Args[1])
 			activeTargetProcess("BrownDust")
 			startDoombook(configMap)
-		case "debug":
+		case "iGacha_debug":
+			fmt.Printf("運行模式：%s\n", os.Args[1])
 			debugSwitch = true
 			start_infinite_gacha(configMap)
-		default:
+		case "iGacha":
+			fmt.Printf("運行模式：%s\n", os.Args[1])
 			for i := 3; i > 0; i-- {
 				fmt.Printf("腳本將在%d秒後開始運行...\n", i)
 				time.Sleep(time.Duration(1000) * time.Millisecond)
@@ -65,15 +74,13 @@ func main() {
 			activeTargetProcess("BrownDust")
 			// 主邏輯運行
 			start_infinite_gacha(configMap)
+		default:
+			fmt.Printf("查無你輸入的模式：%s，請確認是否輸入正確，模式說明如下。\n", os.Args[1])
+			list_mode()
 		}
 	} else {
-		for i := 3; i > 0; i-- {
-			fmt.Printf("腳本將在%d秒後開始運行...\n", i)
-			time.Sleep(time.Duration(1000) * time.Millisecond)
-		}
-		activeTargetProcess("BrownDust")
-		// 主邏輯運行
-		start_infinite_gacha(configMap)
+		fmt.Printf("未檢測到欲運行的模式，請確認欲運行模式為何。模式說明如下：\n\n")
+		list_mode()
 	}
 }
 
@@ -85,8 +92,6 @@ func exitEvent() {
 	if exitEvent {
 		// 確認退出
 		fmt.Println("\n檢測到退出指令，程序即將結束...")
-		pid := robotgo.GetPid()
-		robotgo.ActivePid(pid)
 		os.Exit(0) // 結束程式
 	}
 }
@@ -229,7 +234,7 @@ func load_map_str_float64(csvPath string) map[string]float64 {
 
 	// load csv content
 	csvLines, err := csv.NewReader(csvFile).ReadAll()
-	errHandler(err, "ErrCode 003002. Read CSV file failed.")
+	errHandler(err, "ErrCode 003001. Read CSV file failed.")
 
 	// create map
 	rowCount := len(csvLines)
@@ -279,7 +284,7 @@ func activeTargetProcess(processName string) {
 	// 把所有含有關鍵字的process都active
 	for _, pid := range pids {
 		robotgo.ActivePid(pid)
-		fmt.Println("Activated window for PID:", pid)
+		fmt.Println("喚起BrownDust視窗，PID:", pid)
 	}
 }
 
@@ -296,9 +301,6 @@ func test(configMap map[string]float64) {
 	imgo.Save("test.png", img)
 
 	robotgo.FreeBitmap(sbit)
-
-	pid := robotgo.GetPid()
-	robotgo.ActivePid(pid)
 }
 
 func settingInfo(configMap map[string]float64) {
@@ -307,11 +309,13 @@ func settingInfo(configMap map[string]float64) {
 	imgMap := load_map_str_str("imgPathMap.txt")
 	scoreMap := load_map_str_float64("scoreMap.txt")
 
-	fmt.Println("config設定如下")
+	fmt.Println("config設定如下(小數點後多餘的0可忽略)")
 	for k, v := range configMap {
 		fmt.Printf("%s:%f\n", k, v)
 	}
-	fmt.Printf("螢幕解析度設定錯誤的話，請至「config.txt」中修正「螢幕解析度-寬」與「螢幕解析度-高」的值\n\n")
+	fmt.Printf("目前的螢幕解析度設定是%dx%d，需確認img資料夾中的判定圖片來自相同解析度。\n", int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
+	fmt.Printf("螢幕解析度設定錯誤的話，請至「config.txt」中修正「螢幕解析度-寬」與「螢幕解析度-高」的值\n")
+	fmt.Printf("img資料夾中預設圖片取自環境1920x1080解析度、FHD圖像，若有調整螢幕解析度數值記得一併更換圖片\n\n")
 
 	fmt.Printf("目標分數:%d\n", int(scoreMap["目標分數"]))
 	fmt.Printf("以下是各角色設定的分數與判斷圖片路徑\n")
@@ -371,4 +375,16 @@ func startDoombook(configMap map[string]float64) {
 		findImage(imgMap["skip4"]+imgFormat, -1, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]), configMap["容忍值_小"], true, 100, prRatio_width, prRatio_height)
 		round++
 	}
+}
+
+func list_mode() {
+	for k, v := range modeList {
+		fmt.Printf("模式關鍵字:%s  |  模式說明:%s\n", k, v)
+	}
+
+	fmt.Printf("\n運行指定模式方法：\n")
+	fmt.Printf("1.以「系統管理員」權限啟動「終端機」\n")
+	fmt.Printf("2.「cd」至「autoBD2」資料夾目錄下\n")
+	fmt.Printf("3.運行命令「.\\autoBD2.exe 模式關鍵字」即可運行指定模式\n")
+	fmt.Printf("3-1.範例: 「.\\autoBD2.exe info」\n\n")
 }
