@@ -16,16 +16,17 @@ import (
 )
 
 var (
+	version        = "20250109001"
 	debugSwitch    = false
 	stopKey        = "f1"
 	imgFormat      = ".png"
 	prRatio_width  float64
 	prRatio_height float64
 	modeList       = map[string]string{
-		"iGacha":   "無限抽抽樂-自動抽取",
-		"info":     "查看「無限抽抽樂-自動抽取」的評分設定",
-		"test":     "測試「autoBD2螢幕截圖」與「無樂抽抽樂-自動抽取」的評分邏輯",
-		"doombook": "未日之書-無限重複挑戰",
+		"iGacha":    "無限抽抽樂-自動抽取",
+		"info":      "查看「無限抽抽樂-自動抽取」的評分設定",
+		"test":      "測試「autoBD2螢幕截圖」與「無樂抽抽樂-自動抽取」的評分邏輯",
+		"lastnight": "未日之書-無限重複挑戰",
 	}
 )
 
@@ -34,17 +35,23 @@ func main() {
 	// 啟動監聽 stopKey 的執行緒
 	go exitEvent()
 	fmt.Println("*******************************************************")
+	fmt.Println("Version:" + version)
 	fmt.Println("終止程序請按按鍵 " + stopKey)
 	fmt.Println("*******************************************************")
 
+	if len(os.Args) > 2 {
+		if os.Args[2] == "debug" {
+			debugSwitch = true
+		}
+	}
+
 	// 加載設定檔
 	configMap := load_map_str_float64("config.txt")
-	setScreenPhysicResolutionRatio(configMap)
-
 	if debugSwitch {
 		fmt.Printf("args[]:%v\n", os.Args)
 		fmt.Printf("configMap:%v\n", configMap)
 	}
+	setScreenPhysicResolutionRatio(configMap)
 
 	fmt.Printf("\n\n")
 
@@ -57,14 +64,10 @@ func main() {
 		case "info":
 			fmt.Printf("運行模式：%s\n", os.Args[1])
 			settingInfo(configMap)
-		case "doombook":
+		case "lastnight":
 			fmt.Printf("運行模式：%s\n", os.Args[1])
 			activeTargetProcess("BrownDust")
-			startDoombook(configMap)
-		case "iGacha_debug":
-			fmt.Printf("運行模式：%s\n", os.Args[1])
-			debugSwitch = true
-			start_infinite_gacha(configMap)
+			startLastNight(configMap)
 		case "iGacha":
 			fmt.Printf("運行模式：%s\n", os.Args[1])
 			for i := 3; i > 0; i-- {
@@ -186,7 +189,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 	bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 
 	for character, score := range scoreMap {
-		if (character != "目標分數") && (score > 0) {
+		if character != "目標分數" {
 			var tempPosArr []robotgo.Point
 
 			// 刷1次求快速
@@ -197,9 +200,9 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 			}
 
 			current_core += len(tempPosArr) * int(score)
-			fmt.Printf("當前計分對象[%s]，獲得分數[%d]，當前分數[%d]\n", character, len(tempPosArr)*int(score), current_core)
+			fmt.Printf("發現[%d]個[%s]，獲得分數[%d]，累計總分[%d]\n", len(tempPosArr), character, len(tempPosArr)*int(score), current_core)
 			if debugSwitch {
-				fmt.Printf("tempPosArr:[%v] | len(tempPosArr):%d\n", tempPosArr, len(tempPosArr))
+				fmt.Printf("tempPosArr:「%v」\n", tempPosArr)
 			}
 		}
 	}
@@ -211,7 +214,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 		fmt.Println("終止程式")
 		os.Exit(0)
 
-	} else if current_core >= 300 {
+	} else if current_core >= 100 {
 		if debugSwitch {
 			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 			img := robotgo.ToImage(bitmap_screen)
@@ -313,9 +316,8 @@ func settingInfo(configMap map[string]float64) {
 	for k, v := range configMap {
 		fmt.Printf("%s:%f\n", k, v)
 	}
-	fmt.Printf("目前的螢幕解析度設定是%dx%d，需確認img資料夾中的判定圖片來自相同解析度。\n", int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 	fmt.Printf("螢幕解析度設定錯誤的話，請至「config.txt」中修正「螢幕解析度-寬」與「螢幕解析度-高」的值\n")
-	fmt.Printf("img資料夾中預設圖片取自環境1920x1080解析度、FHD圖像，若有調整螢幕解析度數值記得一併更換圖片\n\n")
+	fmt.Printf("img資料夾中預設圖片取自環境1920x1080解析度、FHD圖像，若本機環境不符記得更換圖片\n\n")
 
 	fmt.Printf("目標分數:%d\n", int(scoreMap["目標分數"]))
 	fmt.Printf("以下是各角色設定的分數與判斷圖片路徑\n")
@@ -330,10 +332,20 @@ func settingInfo(configMap map[string]float64) {
 			fmt.Printf("角色：%s | 分數:%d | 判定圖片路徑:%s\n", character, int(score), imgPath)
 		}
 	}
+	fmt.Printf("目標分數或角色分數設定錯誤的話，請至「scoreMap.txt」中修正")
 }
 
 // 取得 save 資料夾中下一個圖片檔名
 func getNextImageFileName(folderPath string) string {
+
+	// 檢查資料夾是否存在
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		// 如果資料夾不存在，則建立資料夾
+		err := os.Mkdir(folderPath, os.ModePerm)
+		if err != nil {
+			log.Fatalf("無法建立資料夾 %s: %v", folderPath, err)
+		}
+	}
 
 	// 取得資料夾中的檔案
 	files, err := os.ReadDir(folderPath)
@@ -341,8 +353,8 @@ func getNextImageFileName(folderPath string) string {
 		log.Fatalf("無法讀取資料夾 %s: %v", folderPath, err)
 	}
 
+	// 計算檔案數量並生成下一個圖片檔名
 	fileNumb := len(files)
-	// 生成下一個圖片檔名
 	return strconv.Itoa(fileNumb + 1)
 }
 
@@ -355,13 +367,13 @@ func setScreenPhysicResolutionRatio(configMap map[string]float64) {
 	prRatio_width = float64(pW) / float64(rW)
 	prRatio_height = float64(pH) / float64(rH)
 	if debugSwitch {
-		fmt.Printf("configMap:%v\nconfigMap[\"螢幕解析度-寬\"]:%f\n", configMap, configMap["螢幕解析度-寬"])
+		fmt.Printf("configMap:%v\n", configMap)
 		fmt.Printf("physical width:%d | resolution width:%d | widthRatio:%f\n", pW, rW, prRatio_width)
 		fmt.Printf("physical height:%d | resolution height:%d | heightRatio:%f\n", pH, rH, prRatio_height)
 	}
 }
 
-func startDoombook(configMap map[string]float64) {
+func startLastNight(configMap map[string]float64) {
 
 	// 加載設定檔
 	imgMap := load_map_str_str("imgPathMap.txt")
