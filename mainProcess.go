@@ -215,11 +215,9 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 
 	} else if current_core >= int(scoreMap["截圖分數"]) {
 		if debugSwitch {
-			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 			img := robotgo.ToImage(bitmap_screen)
 			imgName := getNextImageFileName("save")
 			imgo.Save("save/"+imgName+"-"+strconv.Itoa(current_core)+".png", img)
-			robotgo.FreeBitmap(bitmap_screen)
 		}
 		fmt.Printf("當前總分 %d 小於目標分數 %d ，繼續下一輪。\n", current_core, int(target_score))
 	} else {
