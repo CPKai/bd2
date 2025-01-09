@@ -206,7 +206,6 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 			}
 		}
 	}
-	robotgo.FreeBitmap(bitmap_screen)
 
 	if current_core >= int(target_score) {
 		fmt.Printf("當前總分 %d 大於等於目標分數 %d ，結束抽取。\n", current_core, int(target_score))
@@ -214,7 +213,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 		fmt.Println("終止程式")
 		os.Exit(0)
 
-	} else if current_core >= 100 {
+	} else if current_core >= int(scoreMap["截圖分數"]) {
 		if debugSwitch {
 			bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 			img := robotgo.ToImage(bitmap_screen)
@@ -226,6 +225,8 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 	} else {
 		fmt.Printf("當前總分 %d 小於目標分數 %d ，繼續下一輪。\n", current_core, int(target_score))
 	}
+
+	robotgo.FreeBitmap(bitmap_screen)
 }
 
 func load_map_str_float64(csvPath string) map[string]float64 {
