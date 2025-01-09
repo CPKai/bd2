@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	version        = "20250109001"
+	version        = "20250109006"
 	debugSwitch    = false
 	stopKey        = "f1"
 	imgFormat      = ".png"
@@ -189,7 +189,7 @@ func calculateScore(configMap map[string]float64, imgMap map[string]string) {
 	bitmap_screen := robotgo.CaptureScreen(0, 0, int(configMap["螢幕解析度-寬"]), int(configMap["螢幕解析度-高"]))
 
 	for character, score := range scoreMap {
-		if character != "目標分數" {
+		if character != "目標分數" && character != "截圖分數" {
 			var tempPosArr []robotgo.Point
 
 			// 刷1次求快速
@@ -366,7 +366,6 @@ func setScreenPhysicResolutionRatio(configMap map[string]float64) {
 	prRatio_width = float64(pW) / float64(rW)
 	prRatio_height = float64(pH) / float64(rH)
 	if debugSwitch {
-		fmt.Printf("configMap:%v\n", configMap)
 		fmt.Printf("physical width:%d | resolution width:%d | widthRatio:%f\n", pW, rW, prRatio_width)
 		fmt.Printf("physical height:%d | resolution height:%d | heightRatio:%f\n", pH, rH, prRatio_height)
 	}
