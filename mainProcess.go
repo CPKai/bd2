@@ -324,15 +324,15 @@ func settingInfo(configMap map[string]float64) {
 	fmt.Printf("目標分數:%d\n", int(scoreMap["目標分數"]))
 	fmt.Printf("以下是各角色設定的分數與判斷圖片路徑\n")
 	for character, score := range scoreMap {
-		if character != "目標分數" {
-			var imgPath string
-			if imgMap[character] != "" {
-				imgPath = imgMap[character] + imgFormat
-			} else {
-				imgPath = "未找到" + character + "的圖片路徑"
-			}
-			fmt.Printf("角色：%s | 分數:%d | 判定圖片路徑:%s\n", character, int(score), imgPath)
+		var imgPath string
+		if imgMap[character] != "" {
+			imgPath = imgMap[character] + imgFormat
+		} else if character == "目標分數" || character == "截圖分數" {
+			imgPath = "不需要圖片"
+		} else {
+			imgPath = "未找到" + character + "的圖片路徑"
 		}
+		fmt.Printf("角色：%s | 分數:%d | 判定圖片路徑:%s\n", character, int(score), imgPath)
 	}
 	fmt.Printf("目標分數或角色分數設定錯誤的話，請至「scoreMap.txt」中修正")
 }
