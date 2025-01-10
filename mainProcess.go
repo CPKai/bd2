@@ -159,6 +159,9 @@ func findImage(imgPath string, scanMaxTime int, resolutionWidth int, resolutionH
 			resultPos = []int{fx, fy}
 			cx := int(math.Ceil(float64(fx) * prRatio_width))
 			cy := int(math.Ceil(float64(fy) * prRatio_height))
+			if debugSwitch {
+				fmt.Printf("click_x:%d | click_y: %d\n", cx, cy)
+			}
 			if clickImg {
 				time.Sleep(time.Duration(intervalTime) * time.Millisecond)
 				robotgo.MoveClick(cx, cy, "left", false)
